@@ -1,0 +1,10 @@
+com/apiposture/rules/privilege/ExcessiveRoleAccessRule.class
+com/apiposture/rules/exposure/PublicWithoutExplicitIntentRule.class
+com/apiposture/rules/RuleEngine.class
+com/apiposture/rules/consistency/MissingAuthOnWritesRule.class
+com/apiposture/rules/surface/ControllerWithoutAuthRule.class
+com/apiposture/rules/privilege/WeakRoleNamingRule.class
+com/apiposture/rules/exposure/PermitAllOnWriteRule.class
+com/apiposture/rules/surface/SensitiveRouteKeywordsRule.class
+com/apiposture/rules/consistency/ControllerMethodConflictRule.class
+com/apiposture/rules/SecurityRule.class

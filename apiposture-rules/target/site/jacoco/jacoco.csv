@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ApiPosture Rules,com.apiposture.rules.consistency,ControllerMethodConflictRule,45,18,7,3,14,7,8,3,3,3
+ApiPosture Rules,com.apiposture.rules.consistency,MissingAuthOnWritesRule,6,74,1,7,1,25,3,8,2,5
+ApiPosture Rules,com.apiposture.rules.exposure,PermitAllOnWriteRule,58,20,2,4,17,7,6,4,4,3
+ApiPosture Rules,com.apiposture.rules.exposure,PublicWithoutExplicitIntentRule,2,52,1,5,1,18,2,7,1,5
+ApiPosture Rules,com.apiposture.rules,RuleEngine,31,183,0,10,11,41,2,17,2,12
+ApiPosture Rules,com.apiposture.rules,SecurityRule,13,0,0,0,6,0,2,0,2,0
+ApiPosture Rules,com.apiposture.rules.surface,ControllerWithoutAuthRule,4,56,4,6,2,17,5,6,1,5
+ApiPosture Rules,com.apiposture.rules.surface,SensitiveRouteKeywordsRule,41,119,1,3,13,11,4,5,3,4
+ApiPosture Rules,com.apiposture.rules.privilege,ExcessiveRoleAccessRule,4,64,1,3,2,19,2,6,1,5
+ApiPosture Rules,com.apiposture.rules.privilege,WeakRoleNamingRule,4,85,2,4,2,22,3,8,1,7

@@ -1,0 +1,10 @@
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/RuleEngine.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/SecurityRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/consistency/ControllerMethodConflictRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/consistency/MissingAuthOnWritesRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/exposure/PermitAllOnWriteRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/exposure/PublicWithoutExplicitIntentRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/privilege/ExcessiveRoleAccessRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/privilege/WeakRoleNamingRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/surface/ControllerWithoutAuthRule.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/main/java/com/apiposture/rules/surface/SensitiveRouteKeywordsRule.java

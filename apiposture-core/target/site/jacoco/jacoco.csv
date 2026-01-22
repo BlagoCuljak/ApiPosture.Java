@@ -1,0 +1,25 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ApiPosture Core,com.apiposture.core.classification,SecurityClassifier,48,0,14,0,16,0,10,0,3,0
+ApiPosture Core,com.apiposture.core.models,EndpointType,0,15,0,0,0,3,0,1,0,1
+ApiPosture Core,com.apiposture.core.models,ScanResult.Builder,82,0,0,0,21,0,10,0,10,0
+ApiPosture Core,com.apiposture.core.models,Severity,72,0,6,0,16,0,8,0,5,0
+ApiPosture Core,com.apiposture.core.models,SourceLocation,77,18,12,0,11,3,8,2,2,2
+ApiPosture Core,com.apiposture.core.models,AuthorizationInfo,195,103,36,10,29,24,31,11,8,11
+ApiPosture Core,com.apiposture.core.models,AuthorizationInfo.Builder,19,59,0,0,6,18,3,9,3,9
+ApiPosture Core,com.apiposture.core.models,HttpMethod,24,56,2,0,8,10,4,1,3,1
+ApiPosture Core,com.apiposture.core.models,SecurityClassification,60,0,8,0,13,0,8,0,4,0
+ApiPosture Core,com.apiposture.core.models,Finding,54,0,4,0,6,0,6,0,4,0
+ApiPosture Core,com.apiposture.core.models,Finding.Builder,52,0,0,0,15,0,8,0,8,0
+ApiPosture Core,com.apiposture.core.models,Endpoint,106,31,4,0,15,2,11,2,9,2
+ApiPosture Core,com.apiposture.core.models,ScanResult,215,0,14,0,33,0,18,0,11,0
+ApiPosture Core,com.apiposture.core.models,Endpoint.Builder,12,72,0,0,4,19,2,9,2,9
+ApiPosture Core,com.apiposture.core.discovery,ControllerEndpointDiscoverer,63,399,15,27,14,100,13,33,1,24
+ApiPosture Core,com.apiposture.core.authorization,AnnotationAuthorizationExtractor,102,309,16,30,23,74,19,25,6,13
+ApiPosture Core,com.apiposture.core.extensions,ExtensionRule,2,0,0,0,1,0,1,0,1,0
+ApiPosture Core,com.apiposture.core.extensions,ApiPostureExtension,4,0,0,0,3,0,3,0,3,0
+ApiPosture Core,com.apiposture.core.extensions,ExtensionManager,150,0,6,0,34,0,19,0,16,0
+ApiPosture Core,com.apiposture.core.analysis,SourceFileLoader.new SimpleFileVisitor() {...},121,0,32,0,25,0,20,0,4,0
+ApiPosture Core,com.apiposture.core.analysis,SourceFileLoader.ParsedFile,19,0,0,0,3,0,3,0,3,0
+ApiPosture Core,com.apiposture.core.analysis,ProjectAnalyzer,100,0,4,0,24,0,5,0,3,0
+ApiPosture Core,com.apiposture.core.analysis,ProjectAnalyzer.AnalysisResult,32,0,0,0,8,0,2,0,2,0
+ApiPosture Core,com.apiposture.core.analysis,SourceFileLoader,116,39,14,2,26,11,13,3,5,3

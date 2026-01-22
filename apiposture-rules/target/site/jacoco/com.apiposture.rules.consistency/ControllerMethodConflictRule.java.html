@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerMethodConflictRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Rules</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.rules.consistency</a> &gt; <span class="el_source">ControllerMethodConflictRule.java</span></div><h1>ControllerMethodConflictRule.java</h1><pre class="source lang-java linenums">package com.apiposture.rules.consistency;
+
+import com.apiposture.core.models.*;
+import com.apiposture.rules.SecurityRule;
+
+import java.util.Optional;
+
+/**
+ * AP003: Detects when method-level @PermitAll overrides class-level authorization.
+ * This pattern can lead to unintended security holes.
+ */
+<span class="fc" id="L12">public class ControllerMethodConflictRule implements SecurityRule {</span>
+
+    @Override
+    public String getId() {
+<span class="fc" id="L16">        return &quot;AP003&quot;;</span>
+    }
+
+    @Override
+    public String getName() {
+<span class="nc" id="L21">        return &quot;Controller/method authorization conflict&quot;;</span>
+    }
+
+    @Override
+    public String getDescription() {
+<span class="nc" id="L26">        return &quot;Detects when method-level @PermitAll overrides class-level authorization, &quot; +</span>
+                &quot;which may indicate unintended security bypass.&quot;;
+    }
+
+    @Override
+    public Severity getDefaultSeverity() {
+<span class="nc" id="L32">        return Severity.MEDIUM;</span>
+    }
+
+    @Override
+    public Optional&lt;Finding&gt; evaluate(Endpoint endpoint) {
+<span class="fc" id="L37">        AuthorizationInfo auth = endpoint.authorization();</span>
+
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (auth == null) {</span>
+<span class="nc" id="L40">            return Optional.empty();</span>
+        }
+
+        // Check if method has @PermitAll and inherited class auth
+<span class="pc bpc" id="L44" title="3 of 4 branches missed.">        if (auth.hasPermitAll() &amp;&amp; auth.isInherited()) {</span>
+<span class="nc" id="L45">            return Optional.of(Finding.builder()</span>
+<span class="nc" id="L46">                    .ruleId(getId())</span>
+<span class="nc" id="L47">                    .ruleName(getName())</span>
+<span class="nc" id="L48">                    .severity(getDefaultSeverity())</span>
+<span class="nc" id="L49">                    .message(&quot;Endpoint '%s' has @PermitAll that overrides class-level authorization&quot;</span>
+<span class="nc" id="L50">                            .formatted(endpoint.route()))</span>
+<span class="nc" id="L51">                    .endpoint(endpoint)</span>
+<span class="nc" id="L52">                    .recommendation(&quot;Review if this override is intentional. Consider documenting the security decision.&quot;)</span>
+<span class="nc" id="L53">                    .build());</span>
+        }
+
+        // Also check for explicit permit all with class-level auth indicator
+        // This happens when the inheritance flag is set from class level
+<span class="pc bpc" id="L58" title="3 of 4 branches missed.">        if (auth.hasPermitAll() &amp;&amp; &quot;class&quot;.equals(auth.getInheritedFrom())) {</span>
+<span class="nc" id="L59">            return Optional.empty(); // This is actually the case where class auth was overridden properly</span>
+        }
+
+<span class="fc" id="L62">        return Optional.empty();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthorizationInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.models</a> &gt; <span class="el_source">AuthorizationInfo.java</span></div><h1>AuthorizationInfo.java</h1><pre class="source lang-java linenums">package com.apiposture.core.models;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Authorization information extracted from Spring Security annotations.
+ */
+public final class AuthorizationInfo {
+
+    @JsonProperty(&quot;hasAuthorize&quot;)
+    private final boolean hasAuthorize;
+
+    @JsonProperty(&quot;hasPermitAll&quot;)
+    private final boolean hasPermitAll;
+
+    @JsonProperty(&quot;hasDenyAll&quot;)
+    private final boolean hasDenyAll;
+
+    @JsonProperty(&quot;isAuthenticated&quot;)
+    private final boolean isAuthenticated;
+
+    @JsonProperty(&quot;roles&quot;)
+    private final Set&lt;String&gt; roles;
+
+    @JsonProperty(&quot;authorities&quot;)
+    private final Set&lt;String&gt; authorities;
+
+    @JsonProperty(&quot;preAuthorizeExpression&quot;)
+    private final String preAuthorizeExpression;
+
+    @JsonProperty(&quot;inheritedFrom&quot;)
+    private final String inheritedFrom;
+
+<span class="fc" id="L39">    private AuthorizationInfo(Builder builder) {</span>
+<span class="fc" id="L40">        this.hasAuthorize = builder.hasAuthorize;</span>
+<span class="fc" id="L41">        this.hasPermitAll = builder.hasPermitAll;</span>
+<span class="fc" id="L42">        this.hasDenyAll = builder.hasDenyAll;</span>
+<span class="fc" id="L43">        this.isAuthenticated = builder.isAuthenticated;</span>
+<span class="fc" id="L44">        this.roles = Collections.unmodifiableSet(new HashSet&lt;&gt;(builder.roles));</span>
+<span class="fc" id="L45">        this.authorities = Collections.unmodifiableSet(new HashSet&lt;&gt;(builder.authorities));</span>
+<span class="fc" id="L46">        this.preAuthorizeExpression = builder.preAuthorizeExpression;</span>
+<span class="fc" id="L47">        this.inheritedFrom = builder.inheritedFrom;</span>
+<span class="fc" id="L48">    }</span>
+
+    public boolean hasAuthorize() {
+<span class="fc" id="L51">        return hasAuthorize;</span>
+    }
+
+    public boolean hasPermitAll() {
+<span class="fc" id="L55">        return hasPermitAll;</span>
+    }
+
+    public boolean hasDenyAll() {
+<span class="fc" id="L59">        return hasDenyAll;</span>
+    }
+
+    public boolean isAuthenticated() {
+<span class="fc" id="L63">        return isAuthenticated;</span>
+    }
+
+    public Set&lt;String&gt; getRoles() {
+<span class="fc" id="L67">        return roles;</span>
+    }
+
+    public Set&lt;String&gt; getAuthorities() {
+<span class="fc" id="L71">        return authorities;</span>
+    }
+
+    public String getPreAuthorizeExpression() {
+<span class="nc" id="L75">        return preAuthorizeExpression;</span>
+    }
+
+    public String getInheritedFrom() {
+<span class="nc" id="L79">        return inheritedFrom;</span>
+    }
+
+    /**
+     * Check if this authorization info has any form of security requirement.
+     */
+    public boolean hasAnySecurity() {
+<span class="pc bpc" id="L86" title="5 of 10 branches missed.">        return hasAuthorize || hasDenyAll || isAuthenticated || !roles.isEmpty() || !authorities.isEmpty();</span>
+    }
+
+    /**
+     * Check if this authorization info explicitly allows public access.
+     */
+    public boolean isExplicitlyPublic() {
+<span class="nc" id="L93">        return hasPermitAll;</span>
+    }
+
+    /**
+     * Check if this authorization info is inherited from a class-level annotation.
+     */
+    public boolean isInherited() {
+<span class="nc bnc" id="L100" title="All 4 branches missed.">        return inheritedFrom != null &amp;&amp; !inheritedFrom.isBlank();</span>
+    }
+
+    /**
+     * Create empty authorization info (no security).
+     */
+    public static AuthorizationInfo empty() {
+<span class="fc" id="L107">        return builder().build();</span>
+    }
+
+    /**
+     * Create new builder.
+     */
+    public static Builder builder() {
+<span class="fc" id="L114">        return new Builder();</span>
+    }
+
+    /**
+     * Create builder from existing instance.
+     */
+    public Builder toBuilder() {
+<span class="nc" id="L121">        return new Builder()</span>
+<span class="nc" id="L122">                .hasAuthorize(this.hasAuthorize)</span>
+<span class="nc" id="L123">                .hasPermitAll(this.hasPermitAll)</span>
+<span class="nc" id="L124">                .hasDenyAll(this.hasDenyAll)</span>
+<span class="nc" id="L125">                .isAuthenticated(this.isAuthenticated)</span>
+<span class="nc" id="L126">                .roles(this.roles)</span>
+<span class="nc" id="L127">                .authorities(this.authorities)</span>
+<span class="nc" id="L128">                .preAuthorizeExpression(this.preAuthorizeExpression)</span>
+<span class="nc" id="L129">                .inheritedFrom(this.inheritedFrom);</span>
+    }
+
+    /**
+     * Merge this authorization info with another, with method-level taking precedence.
+     */
+    public AuthorizationInfo mergeWith(AuthorizationInfo methodLevel) {
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (methodLevel == null) {</span>
+<span class="nc" id="L137">            return this;</span>
+        }
+
+        // Method-level @PermitAll or @DenyAll completely overrides class-level
+<span class="pc bpc" id="L141" title="2 of 4 branches missed.">        if (methodLevel.hasPermitAll || methodLevel.hasDenyAll) {</span>
+<span class="nc" id="L142">            return methodLevel;</span>
+        }
+
+        // If method has its own authorization, it overrides class
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (methodLevel.hasAnySecurity()) {</span>
+<span class="nc" id="L147">            return methodLevel;</span>
+        }
+
+        // Otherwise, inherit from class with note about inheritance
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if (this.hasAnySecurity()) {</span>
+<span class="nc" id="L152">            return this.toBuilder()</span>
+<span class="nc" id="L153">                    .inheritedFrom(&quot;class&quot;)</span>
+<span class="nc" id="L154">                    .build();</span>
+        }
+
+<span class="fc" id="L157">        return methodLevel;</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L163" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="nc" id="L164">        AuthorizationInfo that = (AuthorizationInfo) o;</span>
+<span class="nc bnc" id="L165" title="All 8 branches missed.">        return hasAuthorize == that.hasAuthorize &amp;&amp;</span>
+                hasPermitAll == that.hasPermitAll &amp;&amp;
+                hasDenyAll == that.hasDenyAll &amp;&amp;
+                isAuthenticated == that.isAuthenticated &amp;&amp;
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                Objects.equals(roles, that.roles) &amp;&amp;</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                Objects.equals(authorities, that.authorities) &amp;&amp;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">                Objects.equals(preAuthorizeExpression, that.preAuthorizeExpression) &amp;&amp;</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">                Objects.equals(inheritedFrom, that.inheritedFrom);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L177">        return Objects.hash(hasAuthorize, hasPermitAll, hasDenyAll, isAuthenticated,</span>
+                roles, authorities, preAuthorizeExpression, inheritedFrom);
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L183">        return &quot;AuthorizationInfo{&quot; +</span>
+                &quot;hasAuthorize=&quot; + hasAuthorize +
+                &quot;, hasPermitAll=&quot; + hasPermitAll +
+                &quot;, hasDenyAll=&quot; + hasDenyAll +
+                &quot;, isAuthenticated=&quot; + isAuthenticated +
+                &quot;, roles=&quot; + roles +
+                &quot;, authorities=&quot; + authorities +
+                &quot;, preAuthorizeExpression='&quot; + preAuthorizeExpression + '\'' +
+                &quot;, inheritedFrom='&quot; + inheritedFrom + '\'' +
+                '}';
+    }
+
+    /**
+     * Builder for AuthorizationInfo.
+     */
+<span class="fc" id="L198">    public static class Builder {</span>
+        private boolean hasAuthorize;
+        private boolean hasPermitAll;
+        private boolean hasDenyAll;
+        private boolean isAuthenticated;
+<span class="fc" id="L203">        private Set&lt;String&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L204">        private Set&lt;String&gt; authorities = new HashSet&lt;&gt;();</span>
+        private String preAuthorizeExpression;
+        private String inheritedFrom;
+
+        public Builder hasAuthorize(boolean hasAuthorize) {
+<span class="fc" id="L209">            this.hasAuthorize = hasAuthorize;</span>
+<span class="fc" id="L210">            return this;</span>
+        }
+
+        public Builder hasPermitAll(boolean hasPermitAll) {
+<span class="fc" id="L214">            this.hasPermitAll = hasPermitAll;</span>
+<span class="fc" id="L215">            return this;</span>
+        }
+
+        public Builder hasDenyAll(boolean hasDenyAll) {
+<span class="fc" id="L219">            this.hasDenyAll = hasDenyAll;</span>
+<span class="fc" id="L220">            return this;</span>
+        }
+
+        public Builder isAuthenticated(boolean isAuthenticated) {
+<span class="fc" id="L224">            this.isAuthenticated = isAuthenticated;</span>
+<span class="fc" id="L225">            return this;</span>
+        }
+
+        public Builder roles(Set&lt;String&gt; roles) {
+<span class="fc" id="L229">            this.roles = new HashSet&lt;&gt;(roles);</span>
+<span class="fc" id="L230">            return this;</span>
+        }
+
+        public Builder addRole(String role) {
+<span class="nc" id="L234">            this.roles.add(role);</span>
+<span class="nc" id="L235">            return this;</span>
+        }
+
+        public Builder authorities(Set&lt;String&gt; authorities) {
+<span class="fc" id="L239">            this.authorities = new HashSet&lt;&gt;(authorities);</span>
+<span class="fc" id="L240">            return this;</span>
+        }
+
+        public Builder addAuthority(String authority) {
+<span class="nc" id="L244">            this.authorities.add(authority);</span>
+<span class="nc" id="L245">            return this;</span>
+        }
+
+        public Builder preAuthorizeExpression(String expression) {
+<span class="fc" id="L249">            this.preAuthorizeExpression = expression;</span>
+<span class="fc" id="L250">            return this;</span>
+        }
+
+        public Builder inheritedFrom(String inheritedFrom) {
+<span class="nc" id="L254">            this.inheritedFrom = inheritedFrom;</span>
+<span class="nc" id="L255">            return this;</span>
+        }
+
+        public AuthorizationInfo build() {
+<span class="fc" id="L259">            return new AuthorizationInfo(this);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

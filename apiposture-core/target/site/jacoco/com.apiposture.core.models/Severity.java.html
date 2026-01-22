@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Severity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.models</a> &gt; <span class="el_source">Severity.java</span></div><h1>Severity.java</h1><pre class="source lang-java linenums">package com.apiposture.core.models;
+
+/**
+ * Severity levels for security findings.
+ */
+<span class="nc" id="L6">public enum Severity {</span>
+<span class="nc" id="L7">    INFO(0),</span>
+<span class="nc" id="L8">    LOW(1),</span>
+<span class="nc" id="L9">    MEDIUM(2),</span>
+<span class="nc" id="L10">    HIGH(3),</span>
+<span class="nc" id="L11">    CRITICAL(4);</span>
+
+    private final int level;
+
+<span class="nc" id="L15">    Severity(int level) {</span>
+<span class="nc" id="L16">        this.level = level;</span>
+<span class="nc" id="L17">    }</span>
+
+    public int getLevel() {
+<span class="nc" id="L20">        return level;</span>
+    }
+
+    /**
+     * Check if this severity is at least as severe as the given severity.
+     */
+    public boolean isAtLeast(Severity other) {
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        return this.level &gt;= other.level;</span>
+    }
+
+    /**
+     * Parse severity from string, case-insensitive.
+     */
+    public static Severity fromString(String value) {
+<span class="nc bnc" id="L34" title="All 4 branches missed.">        if (value == null || value.isBlank()) {</span>
+<span class="nc" id="L35">            return INFO;</span>
+        }
+        try {
+<span class="nc" id="L38">            return Severity.valueOf(value.toUpperCase());</span>
+<span class="nc" id="L39">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L40">            return INFO;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

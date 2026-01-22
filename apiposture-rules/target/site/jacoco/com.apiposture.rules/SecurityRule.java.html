@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Rules</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.rules</a> &gt; <span class="el_source">SecurityRule.java</span></div><h1>SecurityRule.java</h1><pre class="source lang-java linenums">package com.apiposture.rules;
+
+import com.apiposture.core.models.Endpoint;
+import com.apiposture.core.models.Finding;
+import com.apiposture.core.models.Severity;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Interface for security rules that analyze endpoints for potential issues.
+ */
+public interface SecurityRule {
+
+    /**
+     * Get the unique identifier for this rule (e.g., &quot;AP001&quot;).
+     */
+    String getId();
+
+    /**
+     * Get the human-readable name of this rule.
+     */
+    String getName();
+
+    /**
+     * Get the description of what this rule checks.
+     */
+    String getDescription();
+
+    /**
+     * Get the default severity for findings from this rule.
+     */
+    Severity getDefaultSeverity();
+
+    /**
+     * Evaluate an endpoint and return a finding if the rule is violated.
+     *
+     * @param endpoint The endpoint to evaluate
+     * @return Optional finding if the rule is violated, empty otherwise
+     */
+    Optional&lt;Finding&gt; evaluate(Endpoint endpoint);
+
+    /**
+     * Evaluate multiple endpoints and return all findings.
+     *
+     * @param endpoints The endpoints to evaluate
+     * @return List of findings from violated rules
+     */
+    default List&lt;Finding&gt; evaluateAll(List&lt;Endpoint&gt; endpoints) {
+<span class="nc" id="L50">        return endpoints.stream()</span>
+<span class="nc" id="L51">                .map(this::evaluate)</span>
+<span class="nc" id="L52">                .filter(Optional::isPresent)</span>
+<span class="nc" id="L53">                .map(Optional::get)</span>
+<span class="nc" id="L54">                .toList();</span>
+    }
+
+    /**
+     * Check if this rule is enabled by default.
+     */
+    default boolean isEnabledByDefault() {
+<span class="nc" id="L61">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

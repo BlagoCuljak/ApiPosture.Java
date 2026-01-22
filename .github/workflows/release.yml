@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Set version in pom.xml
+        run: mvn versions:set -DnewVersion=${{ steps.get_version.outputs.VERSION }} -B
+
+      - name: Build and package
+        run: mvn clean package -DskipTests -B
+
+      - name: Run tests
+        run: mvn test -B
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            apiposture-cli/target/apiposture.jar
+          body: |
+            ## ApiPosture ${{ steps.get_version.outputs.VERSION }}
+
+            ### Installation
+
+            Download `apiposture.jar` and run:
+            ```bash
+            java -jar apiposture.jar scan /path/to/spring-boot-project
+            ```
+
+            ### Changes
+            See [CHANGELOG.md](CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

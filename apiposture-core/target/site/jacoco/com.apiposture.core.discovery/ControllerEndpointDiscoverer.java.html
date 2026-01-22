@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerEndpointDiscoverer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.discovery</a> &gt; <span class="el_source">ControllerEndpointDiscoverer.java</span></div><h1>ControllerEndpointDiscoverer.java</h1><pre class="source lang-java linenums">package com.apiposture.core.discovery;
+
+import com.apiposture.core.authorization.AnnotationAuthorizationExtractor;
+import com.apiposture.core.models.*;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
+
+import java.util.*;
+
+/**
+ * Discovers endpoints from Spring MVC controllers.
+ * Detects @RestController, @Controller, and request mapping annotations.
+ */
+public class ControllerEndpointDiscoverer implements EndpointDiscoverer {
+
+<span class="fc" id="L19">    private static final Set&lt;String&gt; CONTROLLER_ANNOTATIONS = Set.of(</span>
+            &quot;RestController&quot;, &quot;Controller&quot;
+    );
+
+<span class="fc" id="L23">    private static final Set&lt;String&gt; REQUEST_MAPPING_ANNOTATIONS = Set.of(</span>
+            &quot;RequestMapping&quot;, &quot;GetMapping&quot;, &quot;PostMapping&quot;, &quot;PutMapping&quot;,
+            &quot;DeleteMapping&quot;, &quot;PatchMapping&quot;
+    );
+
+<span class="fc" id="L28">    private static final Map&lt;String, HttpMethod&gt; ANNOTATION_TO_METHOD = Map.of(</span>
+            &quot;GetMapping&quot;, HttpMethod.GET,
+            &quot;PostMapping&quot;, HttpMethod.POST,
+            &quot;PutMapping&quot;, HttpMethod.PUT,
+            &quot;DeleteMapping&quot;, HttpMethod.DELETE,
+            &quot;PatchMapping&quot;, HttpMethod.PATCH
+    );
+
+    private final AnnotationAuthorizationExtractor authExtractor;
+
+<span class="fc" id="L38">    public ControllerEndpointDiscoverer(AnnotationAuthorizationExtractor authExtractor) {</span>
+<span class="fc" id="L39">        this.authExtractor = authExtractor;</span>
+<span class="fc" id="L40">    }</span>
+
+    @Override
+    public List&lt;Endpoint&gt; discover(CompilationUnit compilationUnit, String filePath) {
+<span class="fc" id="L44">        List&lt;Endpoint&gt; endpoints = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L46">        compilationUnit.findAll(ClassOrInterfaceDeclaration.class).stream()</span>
+<span class="fc" id="L47">                .filter(this::isController)</span>
+<span class="fc" id="L48">                .forEach(controller -&gt; {</span>
+<span class="fc" id="L49">                    String controllerName = controller.getNameAsString();</span>
+<span class="fc" id="L50">                    String basePath = extractRequestMappingPath(controller);</span>
+<span class="fc" id="L51">                    AuthorizationInfo classAuth = authExtractor.extract(controller);</span>
+
+<span class="fc" id="L53">                    controller.getMethods().stream()</span>
+<span class="fc" id="L54">                            .filter(this::hasRequestMapping)</span>
+<span class="fc" id="L55">                            .forEach(method -&gt; {</span>
+<span class="fc" id="L56">                                Endpoint endpoint = createEndpoint(</span>
+                                        controller, method, controllerName, basePath,
+                                        classAuth, filePath
+                                );
+<span class="fc" id="L60">                                endpoints.add(endpoint);</span>
+<span class="fc" id="L61">                            });</span>
+<span class="fc" id="L62">                });</span>
+
+<span class="fc" id="L64">        return endpoints;</span>
+    }
+
+    /**
+     * Check if a class is a Spring controller.
+     */
+    private boolean isController(ClassOrInterfaceDeclaration classDecl) {
+<span class="fc" id="L71">        return classDecl.getAnnotations().stream()</span>
+<span class="fc" id="L72">                .anyMatch(a -&gt; CONTROLLER_ANNOTATIONS.contains(a.getNameAsString()));</span>
+    }
+
+    /**
+     * Check if a method has any request mapping annotation.
+     */
+    private boolean hasRequestMapping(MethodDeclaration method) {
+<span class="fc" id="L79">        return method.getAnnotations().stream()</span>
+<span class="fc" id="L80">                .anyMatch(a -&gt; REQUEST_MAPPING_ANNOTATIONS.contains(a.getNameAsString()));</span>
+    }
+
+    /**
+     * Extract the path from @RequestMapping on a class or method.
+     */
+    private String extractRequestMappingPath(NodeWithAnnotations&lt;?&gt; node) {
+<span class="fc" id="L87">        return node.getAnnotations().stream()</span>
+<span class="fc" id="L88">                .filter(a -&gt; REQUEST_MAPPING_ANNOTATIONS.contains(a.getNameAsString()))</span>
+<span class="fc" id="L89">                .findFirst()</span>
+<span class="fc" id="L90">                .map(this::extractPathFromAnnotation)</span>
+<span class="fc" id="L91">                .orElse(&quot;&quot;);</span>
+    }
+
+    /**
+     * Extract path value from a mapping annotation.
+     */
+    private String extractPathFromAnnotation(AnnotationExpr annotation) {
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (annotation instanceof SingleMemberAnnotationExpr single) {</span>
+<span class="fc" id="L99">            return extractStringValue(single.getMemberValue());</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        } else if (annotation instanceof NormalAnnotationExpr normal) {</span>
+<span class="fc" id="L101">            return normal.getPairs().stream()</span>
+<span class="pc bpc" id="L102" title="3 of 4 branches missed.">                    .filter(p -&gt; p.getNameAsString().equals(&quot;value&quot;) || p.getNameAsString().equals(&quot;path&quot;))</span>
+<span class="fc" id="L103">                    .findFirst()</span>
+<span class="fc" id="L104">                    .map(p -&gt; extractStringValue(p.getValue()))</span>
+<span class="fc" id="L105">                    .orElse(&quot;&quot;);</span>
+        }
+<span class="fc" id="L107">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Extract string value from an expression (handles arrays, strings, etc.).
+     */
+    private String extractStringValue(Expression expr) {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (expr instanceof StringLiteralExpr str) {</span>
+<span class="fc" id="L115">            return str.getValue();</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        } else if (expr instanceof ArrayInitializerExpr array) {</span>
+            // Take first element for route
+<span class="nc" id="L118">            return array.getValues().stream()</span>
+<span class="nc" id="L119">                    .findFirst()</span>
+<span class="nc" id="L120">                    .map(this::extractStringValue)</span>
+<span class="nc" id="L121">                    .orElse(&quot;&quot;);</span>
+        }
+<span class="nc" id="L123">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Extract HTTP methods from a mapping annotation.
+     */
+    private Set&lt;HttpMethod&gt; extractHttpMethods(MethodDeclaration method) {
+<span class="fc" id="L130">        Set&lt;HttpMethod&gt; methods = EnumSet.noneOf(HttpMethod.class);</span>
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (AnnotationExpr annotation : method.getAnnotations()) {</span>
+<span class="fc" id="L133">            String name = annotation.getNameAsString();</span>
+
+            // Specific mapping annotations (GetMapping, PostMapping, etc.)
+<span class="fc bfc" id="L136" title="All 2 branches covered.">            if (ANNOTATION_TO_METHOD.containsKey(name)) {</span>
+<span class="fc" id="L137">                methods.add(ANNOTATION_TO_METHOD.get(name));</span>
+            }
+            // @RequestMapping - check method attribute
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">            else if (name.equals(&quot;RequestMapping&quot;)) {</span>
+<span class="fc" id="L141">                methods.addAll(extractMethodsFromRequestMapping(annotation));</span>
+            }
+<span class="fc" id="L143">        }</span>
+
+        // Default to GET if no methods specified
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (methods.isEmpty()) {</span>
+<span class="nc" id="L147">            methods.add(HttpMethod.GET);</span>
+        }
+
+<span class="fc" id="L150">        return methods;</span>
+    }
+
+    /**
+     * Extract HTTP methods from @RequestMapping annotation.
+     */
+    private Set&lt;HttpMethod&gt; extractMethodsFromRequestMapping(AnnotationExpr annotation) {
+<span class="fc" id="L157">        Set&lt;HttpMethod&gt; methods = EnumSet.noneOf(HttpMethod.class);</span>
+
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (annotation instanceof NormalAnnotationExpr normal) {</span>
+<span class="fc" id="L160">            normal.getPairs().stream()</span>
+<span class="fc" id="L161">                    .filter(p -&gt; p.getNameAsString().equals(&quot;method&quot;))</span>
+<span class="fc" id="L162">                    .findFirst()</span>
+<span class="fc" id="L163">                    .ifPresent(pair -&gt; {</span>
+<span class="fc" id="L164">                        Expression value = pair.getValue();</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">                        if (value instanceof ArrayInitializerExpr array) {</span>
+<span class="nc" id="L166">                            array.getValues().forEach(v -&gt; extractMethodFromExpression(v, methods));</span>
+                        } else {
+<span class="fc" id="L168">                            extractMethodFromExpression(value, methods);</span>
+                        }
+<span class="fc" id="L170">                    });</span>
+        }
+
+<span class="fc" id="L173">        return methods;</span>
+    }
+
+    /**
+     * Extract HTTP method from a field access expression (e.g., RequestMethod.GET).
+     */
+    private void extractMethodFromExpression(Expression expr, Set&lt;HttpMethod&gt; methods) {
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">        if (expr instanceof FieldAccessExpr field) {</span>
+<span class="fc" id="L181">            String methodName = field.getNameAsString();</span>
+            try {
+<span class="fc" id="L183">                methods.add(HttpMethod.valueOf(methodName));</span>
+<span class="nc" id="L184">            } catch (IllegalArgumentException ignored) {</span>
+<span class="fc" id="L185">            }</span>
+<span class="pc bnc" id="L186" title="All 2 branches missed.">        } else if (expr instanceof NameExpr name) {</span>
+            // Handle imported static constant
+            try {
+<span class="nc" id="L189">                methods.add(HttpMethod.valueOf(name.getNameAsString()));</span>
+<span class="nc" id="L190">            } catch (IllegalArgumentException ignored) {</span>
+<span class="nc" id="L191">            }</span>
+        }
+<span class="fc" id="L193">    }</span>
+
+    /**
+     * Create an endpoint from a controller method.
+     */
+    private Endpoint createEndpoint(ClassOrInterfaceDeclaration controller,
+                                    MethodDeclaration method,
+                                    String controllerName,
+                                    String basePath,
+                                    AuthorizationInfo classAuth,
+                                    String filePath) {
+<span class="fc" id="L204">        String methodPath = extractRequestMappingPath(method);</span>
+<span class="fc" id="L205">        String route = buildRoute(basePath, methodPath);</span>
+<span class="fc" id="L206">        Set&lt;HttpMethod&gt; httpMethods = extractHttpMethods(method);</span>
+
+        // Get method-level authorization and merge with class-level
+<span class="fc" id="L209">        AuthorizationInfo methodAuth = authExtractor.extract(method);</span>
+<span class="fc" id="L210">        AuthorizationInfo mergedAuth = classAuth.mergeWith(methodAuth);</span>
+
+<span class="fc" id="L212">        int lineNumber = method.getBegin()</span>
+<span class="fc" id="L213">                .map(pos -&gt; pos.line)</span>
+<span class="fc" id="L214">                .orElse(0);</span>
+
+<span class="fc" id="L216">        return Endpoint.builder()</span>
+<span class="fc" id="L217">                .route(route)</span>
+<span class="fc" id="L218">                .methods(httpMethods)</span>
+<span class="fc" id="L219">                .type(EndpointType.CONTROLLER)</span>
+<span class="fc" id="L220">                .controllerName(controllerName)</span>
+<span class="fc" id="L221">                .methodName(method.getNameAsString())</span>
+<span class="fc" id="L222">                .location(new SourceLocation(filePath, lineNumber))</span>
+<span class="fc" id="L223">                .authorization(mergedAuth)</span>
+<span class="fc" id="L224">                .build();</span>
+    }
+
+    /**
+     * Build the full route from base path and method path.
+     */
+    private String buildRoute(String basePath, String methodPath) {
+<span class="fc" id="L231">        String base = normalizePath(basePath);</span>
+<span class="fc" id="L232">        String method = normalizePath(methodPath);</span>
+
+<span class="pc bpc" id="L234" title="1 of 4 branches missed.">        if (base.isEmpty() &amp;&amp; method.isEmpty()) {</span>
+<span class="nc" id="L235">            return &quot;/&quot;;</span>
+        }
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        if (base.isEmpty()) {</span>
+<span class="fc" id="L238">            return &quot;/&quot; + method;</span>
+        }
+<span class="fc bfc" id="L240" title="All 2 branches covered.">        if (method.isEmpty()) {</span>
+<span class="fc" id="L241">            return &quot;/&quot; + base;</span>
+        }
+<span class="fc" id="L243">        return &quot;/&quot; + base + &quot;/&quot; + method;</span>
+    }
+
+    /**
+     * Normalize a path by removing leading/trailing slashes.
+     */
+    private String normalizePath(String path) {
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L251">            return &quot;&quot;;</span>
+        }
+<span class="fc" id="L253">        String normalized = path.trim();</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        if (normalized.startsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L255">            normalized = normalized.substring(1);</span>
+        }
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        if (normalized.endsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L258">            normalized = normalized.substring(0, normalized.length() - 1);</span>
+        }
+<span class="fc" id="L260">        return normalized;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

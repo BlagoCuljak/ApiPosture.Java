@@ -1,0 +1,17 @@
+com/apiposture/cli/output/TerminalFormatter.class
+META-INF/native-image/picocli-generated/reflect-config.json
+com/apiposture/cli/ApiPosture.class
+com/apiposture/cli/commands/LicenseCommand$ActivateCommand.class
+META-INF/native-image/picocli-generated/proxy-config.json
+com/apiposture/cli/output/MarkdownFormatter.class
+com/apiposture/cli/commands/LicenseCommand.class
+META-INF/native-image/picocli-generated/resource-config.json
+com/apiposture/cli/commands/ScanCommand.class
+com/apiposture/cli/output/OutputFormatter.class
+com/apiposture/cli/output/MarkdownFormatter$1.class
+com/apiposture/cli/output/JsonFormatter.class
+com/apiposture/cli/commands/LicenseCommand$DeactivateCommand.class
+com/apiposture/cli/commands/ScanCommand$OutputFormat.class
+com/apiposture/cli/commands/ScanCommand$SortBy.class
+com/apiposture/cli/commands/LicenseCommand$StatusCommand.class
+com/apiposture/cli/output/TerminalFormatter$1.class

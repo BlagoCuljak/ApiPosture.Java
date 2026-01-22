@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SourceLocation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.models</a> &gt; <span class="el_source">SourceLocation.java</span></div><h1>SourceLocation.java</h1><pre class="source lang-java linenums">package com.apiposture.core.models;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * Represents the source code location of an endpoint or finding.
+ */
+<span class="fc" id="L8">public record SourceLocation(</span>
+        @JsonProperty(&quot;filePath&quot;) String filePath,
+        @JsonProperty(&quot;lineNumber&quot;) int lineNumber,
+        @JsonProperty(&quot;column&quot;) int column
+) {
+    /**
+     * Create a location with only file path and line number.
+     */
+    public SourceLocation(String filePath, int lineNumber) {
+<span class="fc" id="L17">        this(filePath, lineNumber, 0);</span>
+<span class="fc" id="L18">    }</span>
+
+    /**
+     * Format as &quot;file:line&quot; or &quot;file:line:column&quot;.
+     */
+    @Override
+    public String toString() {
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if (column &gt; 0) {</span>
+<span class="nc" id="L26">            return &quot;%s:%d:%d&quot;.formatted(filePath, lineNumber, column);</span>
+        }
+<span class="nc" id="L28">        return &quot;%s:%d&quot;.formatted(filePath, lineNumber);</span>
+    }
+
+    /**
+     * Get relative path from a base directory.
+     */
+    public String relativePath(String baseDir) {
+<span class="nc bnc" id="L35" title="All 4 branches missed.">        if (baseDir == null || filePath == null) {</span>
+<span class="nc" id="L36">            return filePath;</span>
+        }
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (filePath.startsWith(baseDir)) {</span>
+<span class="nc" id="L39">            String relative = filePath.substring(baseDir.length());</span>
+<span class="nc bnc" id="L40" title="All 4 branches missed.">            if (relative.startsWith(&quot;/&quot;) || relative.startsWith(&quot;\\&quot;)) {</span>
+<span class="nc" id="L41">                relative = relative.substring(1);</span>
+            }
+<span class="nc" id="L43">            return relative;</span>
+        }
+<span class="nc" id="L45">        return filePath;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

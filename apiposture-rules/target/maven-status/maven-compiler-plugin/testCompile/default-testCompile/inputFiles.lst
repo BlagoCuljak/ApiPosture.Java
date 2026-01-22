@@ -1,0 +1,3 @@
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/RuleEngineTest.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.java
+/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/exposure/PublicWithoutExplicitIntentRuleTest.java

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MissingAuthOnWritesRule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Rules</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.rules.consistency</a> &gt; <span class="el_source">MissingAuthOnWritesRule.java</span></div><h1>MissingAuthOnWritesRule.java</h1><pre class="source lang-java linenums">package com.apiposture.rules.consistency;
+
+import com.apiposture.core.models.*;
+import com.apiposture.rules.SecurityRule;
+
+import java.util.Optional;
+
+/**
+ * AP004: Detects write operations (POST, PUT, DELETE, PATCH) without any authorization.
+ * This is a critical security risk.
+ */
+<span class="fc" id="L12">public class MissingAuthOnWritesRule implements SecurityRule {</span>
+
+    @Override
+    public String getId() {
+<span class="fc" id="L16">        return &quot;AP004&quot;;</span>
+    }
+
+    @Override
+    public String getName() {
+<span class="fc" id="L21">        return &quot;Missing authorization on write operation&quot;;</span>
+    }
+
+    @Override
+    public String getDescription() {
+<span class="nc" id="L26">        return &quot;Detects write operations (POST, PUT, DELETE, PATCH) that have no authorization, &quot; +</span>
+                &quot;which is a critical security vulnerability.&quot;;
+    }
+
+    @Override
+    public Severity getDefaultSeverity() {
+<span class="fc" id="L32">        return Severity.CRITICAL;</span>
+    }
+
+    @Override
+    public Optional&lt;Finding&gt; evaluate(Endpoint endpoint) {
+        // Check if it has write methods
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (!endpoint.hasWriteMethods()) {</span>
+<span class="fc" id="L39">            return Optional.empty();</span>
+        }
+
+        // Check if endpoint is public (no authorization)
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (endpoint.classification() != SecurityClassification.PUBLIC) {</span>
+<span class="fc" id="L44">            return Optional.empty();</span>
+        }
+
+<span class="fc" id="L47">        AuthorizationInfo auth = endpoint.authorization();</span>
+
+        // If explicitly marked with @PermitAll, AP002 handles that
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">        if (auth != null &amp;&amp; auth.hasPermitAll()) {</span>
+<span class="fc" id="L51">            return Optional.empty();</span>
+        }
+
+<span class="fc" id="L54">        String writeMethods = endpoint.methods().stream()</span>
+<span class="fc" id="L55">                .filter(HttpMethod::isWriteMethod)</span>
+<span class="fc" id="L56">                .map(Enum::name)</span>
+<span class="pc" id="L57">                .reduce((a, b) -&gt; a + &quot;, &quot; + b)</span>
+<span class="fc" id="L58">                .orElse(&quot;&quot;);</span>
+
+<span class="fc" id="L60">        return Optional.of(Finding.builder()</span>
+<span class="fc" id="L61">                .ruleId(getId())</span>
+<span class="fc" id="L62">                .ruleName(getName())</span>
+<span class="fc" id="L63">                .severity(getDefaultSeverity())</span>
+<span class="fc" id="L64">                .message(&quot;Endpoint '%s' allows unauthenticated write operations: %s&quot;</span>
+<span class="fc" id="L65">                        .formatted(endpoint.route(), writeMethods))</span>
+<span class="fc" id="L66">                .endpoint(endpoint)</span>
+<span class="fc" id="L67">                .recommendation(&quot;Add @PreAuthorize, @Secured, or @RolesAllowed to restrict write access&quot;)</span>
+<span class="fc" id="L68">                .build());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

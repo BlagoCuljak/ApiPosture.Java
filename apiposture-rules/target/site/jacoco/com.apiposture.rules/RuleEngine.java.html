@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RuleEngine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Rules</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.rules</a> &gt; <span class="el_source">RuleEngine.java</span></div><h1>RuleEngine.java</h1><pre class="source lang-java linenums">package com.apiposture.rules;
+
+import com.apiposture.core.models.Endpoint;
+import com.apiposture.core.models.Finding;
+import com.apiposture.core.models.ScanResult;
+import com.apiposture.core.models.Severity;
+import com.apiposture.rules.consistency.ControllerMethodConflictRule;
+import com.apiposture.rules.consistency.MissingAuthOnWritesRule;
+import com.apiposture.rules.exposure.PermitAllOnWriteRule;
+import com.apiposture.rules.exposure.PublicWithoutExplicitIntentRule;
+import com.apiposture.rules.privilege.ExcessiveRoleAccessRule;
+import com.apiposture.rules.privilege.WeakRoleNamingRule;
+import com.apiposture.rules.surface.ControllerWithoutAuthRule;
+import com.apiposture.rules.surface.SensitiveRouteKeywordsRule;
+
+import java.util.*;
+
+/**
+ * Engine that orchestrates security rule evaluation.
+ */
+public class RuleEngine {
+
+    private final List&lt;SecurityRule&gt; rules;
+    private final Set&lt;String&gt; disabledRules;
+    private Severity minimumSeverity;
+
+<span class="fc" id="L27">    public RuleEngine() {</span>
+<span class="fc" id="L28">        this.rules = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L29">        this.disabledRules = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L30">        this.minimumSeverity = Severity.INFO;</span>
+
+        // Register all built-in rules
+<span class="fc" id="L33">        registerBuiltInRules();</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * Register all built-in security rules.
+     */
+    private void registerBuiltInRules() {
+        // Exposure rules
+<span class="fc" id="L41">        rules.add(new PublicWithoutExplicitIntentRule());  // AP001</span>
+<span class="fc" id="L42">        rules.add(new PermitAllOnWriteRule());             // AP002</span>
+
+        // Consistency rules
+<span class="fc" id="L45">        rules.add(new ControllerMethodConflictRule());     // AP003</span>
+<span class="fc" id="L46">        rules.add(new MissingAuthOnWritesRule());          // AP004</span>
+
+        // Privilege rules
+<span class="fc" id="L49">        rules.add(new ExcessiveRoleAccessRule());          // AP005</span>
+<span class="fc" id="L50">        rules.add(new WeakRoleNamingRule());               // AP006</span>
+
+        // Surface rules
+<span class="fc" id="L53">        rules.add(new SensitiveRouteKeywordsRule());       // AP007</span>
+<span class="fc" id="L54">        rules.add(new ControllerWithoutAuthRule());        // AP008</span>
+<span class="fc" id="L55">    }</span>
+
+    /**
+     * Add a custom rule to the engine.
+     */
+    public void addRule(SecurityRule rule) {
+<span class="nc" id="L61">        rules.add(rule);</span>
+<span class="nc" id="L62">    }</span>
+
+    /**
+     * Disable a rule by its ID.
+     */
+    public void disableRule(String ruleId) {
+<span class="fc" id="L68">        disabledRules.add(ruleId);</span>
+<span class="fc" id="L69">    }</span>
+
+    /**
+     * Enable a previously disabled rule.
+     */
+    public void enableRule(String ruleId) {
+<span class="fc" id="L75">        disabledRules.remove(ruleId);</span>
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Set minimum severity for reported findings.
+     */
+    public void setMinimumSeverity(Severity severity) {
+<span class="fc" id="L82">        this.minimumSeverity = severity;</span>
+<span class="fc" id="L83">    }</span>
+
+    /**
+     * Get all registered rules.
+     */
+    public List&lt;SecurityRule&gt; getRules() {
+<span class="fc" id="L89">        return Collections.unmodifiableList(rules);</span>
+    }
+
+    /**
+     * Evaluate all endpoints against all enabled rules.
+     */
+    public List&lt;Finding&gt; evaluate(List&lt;Endpoint&gt; endpoints) {
+<span class="fc" id="L96">        List&lt;Finding&gt; findings = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (SecurityRule rule : rules) {</span>
+            // Skip disabled rules
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (disabledRules.contains(rule.getId())) {</span>
+<span class="fc" id="L101">                continue;</span>
+            }
+
+            // Evaluate each endpoint
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            for (Endpoint endpoint : endpoints) {</span>
+<span class="fc" id="L106">                rule.evaluate(endpoint).ifPresent(finding -&gt; {</span>
+                    // Only include if severity meets minimum threshold
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                    if (finding.severity().isAtLeast(minimumSeverity)) {</span>
+<span class="fc" id="L109">                        findings.add(finding);</span>
+                    }
+<span class="fc" id="L111">                });</span>
+<span class="fc" id="L112">            }</span>
+<span class="fc" id="L113">        }</span>
+
+        // Sort by severity (highest first), then by rule ID
+<span class="fc" id="L116">        findings.sort(Comparator</span>
+<span class="fc" id="L117">                .comparing((Finding f) -&gt; f.severity().getLevel()).reversed()</span>
+<span class="fc" id="L118">                .thenComparing(Finding::ruleId));</span>
+
+<span class="fc" id="L120">        return findings;</span>
+    }
+
+    /**
+     * Evaluate endpoints and create a complete scan result.
+     */
+    public ScanResult evaluateToScanResult(ScanResult analysisResult) {
+<span class="nc" id="L127">        List&lt;Finding&gt; findings = evaluate(analysisResult.endpoints());</span>
+
+<span class="nc" id="L129">        return ScanResult.builder()</span>
+<span class="nc" id="L130">                .projectPath(analysisResult.projectPath())</span>
+<span class="nc" id="L131">                .endpoints(analysisResult.endpoints())</span>
+<span class="nc" id="L132">                .findings(findings)</span>
+<span class="nc" id="L133">                .scannedFiles(analysisResult.scannedFiles())</span>
+<span class="nc" id="L134">                .scanDuration(analysisResult.scanDuration())</span>
+<span class="nc" id="L135">                .timestamp(analysisResult.timestamp())</span>
+<span class="nc" id="L136">                .build();</span>
+    }
+
+    /**
+     * Get rule by ID.
+     */
+    public Optional&lt;SecurityRule&gt; getRule(String ruleId) {
+<span class="fc" id="L143">        return rules.stream()</span>
+<span class="fc" id="L144">                .filter(r -&gt; r.getId().equals(ruleId))</span>
+<span class="fc" id="L145">                .findFirst();</span>
+    }
+
+    /**
+     * Check if a specific rule is enabled.
+     */
+    public boolean isRuleEnabled(String ruleId) {
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        return !disabledRules.contains(ruleId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

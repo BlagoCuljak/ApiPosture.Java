@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Endpoint.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.models</a> &gt; <span class="el_source">Endpoint.java</span></div><h1>Endpoint.java</h1><pre class="source lang-java linenums">package com.apiposture.core.models;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.EnumSet;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Represents a discovered API endpoint.
+ */
+<span class="fc" id="L12">public record Endpoint(</span>
+        @JsonProperty(&quot;route&quot;) String route,
+        @JsonProperty(&quot;methods&quot;) Set&lt;HttpMethod&gt; methods,
+        @JsonProperty(&quot;type&quot;) EndpointType type,
+        @JsonProperty(&quot;controllerName&quot;) String controllerName,
+        @JsonProperty(&quot;methodName&quot;) String methodName,
+        @JsonProperty(&quot;location&quot;) SourceLocation location,
+        @JsonProperty(&quot;authorization&quot;) AuthorizationInfo authorization,
+        @JsonProperty(&quot;classification&quot;) SecurityClassification classification
+) {
+    /**
+     * Create endpoint with default classification (will be computed later).
+     */
+    public Endpoint(String route, Set&lt;HttpMethod&gt; methods, EndpointType type,
+                    String controllerName, String methodName, SourceLocation location,
+                    AuthorizationInfo authorization) {
+<span class="nc" id="L28">        this(route, methods, type, controllerName, methodName, location, authorization, null);</span>
+<span class="nc" id="L29">    }</span>
+
+    /**
+     * Check if this endpoint accepts any write methods.
+     */
+    public boolean hasWriteMethods() {
+<span class="nc" id="L35">        return methods.stream().anyMatch(HttpMethod::isWriteMethod);</span>
+    }
+
+    /**
+     * Check if this endpoint accepts any read methods.
+     */
+    public boolean hasReadMethods() {
+<span class="nc" id="L42">        return methods.stream().anyMatch(HttpMethod::isReadMethod);</span>
+    }
+
+    /**
+     * Check if this endpoint is public (no authorization required).
+     */
+    public boolean isPublic() {
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        return classification == SecurityClassification.PUBLIC;</span>
+    }
+
+    /**
+     * Get the fully qualified endpoint identifier.
+     */
+    public String getIdentifier() {
+<span class="nc" id="L56">        return &quot;%s %s&quot;.formatted(formatMethods(), route);</span>
+    }
+
+    /**
+     * Format methods as comma-separated string.
+     */
+    public String formatMethods() {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (methods.isEmpty()) {</span>
+<span class="nc" id="L64">            return &quot;ALL&quot;;</span>
+        }
+<span class="nc" id="L66">        return methods.stream()</span>
+<span class="nc" id="L67">                .map(Enum::name)</span>
+<span class="nc" id="L68">                .sorted()</span>
+<span class="nc" id="L69">                .reduce((a, b) -&gt; a + &quot;,&quot; + b)</span>
+<span class="nc" id="L70">                .orElse(&quot;ALL&quot;);</span>
+    }
+
+    /**
+     * Create new endpoint with updated classification.
+     */
+    public Endpoint withClassification(SecurityClassification newClassification) {
+<span class="nc" id="L77">        return new Endpoint(route, methods, type, controllerName, methodName,</span>
+                location, authorization, newClassification);
+    }
+
+    /**
+     * Create new endpoint with updated authorization.
+     */
+    public Endpoint withAuthorization(AuthorizationInfo newAuthorization) {
+<span class="nc" id="L85">        return new Endpoint(route, methods, type, controllerName, methodName,</span>
+                location, newAuthorization, classification);
+    }
+
+    /**
+     * Builder for creating Endpoint instances.
+     */
+    public static Builder builder() {
+<span class="fc" id="L93">        return new Builder();</span>
+    }
+
+<span class="fc" id="L96">    public static class Builder {</span>
+        private String route;
+<span class="fc" id="L98">        private Set&lt;HttpMethod&gt; methods = EnumSet.noneOf(HttpMethod.class);</span>
+<span class="fc" id="L99">        private EndpointType type = EndpointType.CONTROLLER;</span>
+        private String controllerName;
+        private String methodName;
+        private SourceLocation location;
+<span class="fc" id="L103">        private AuthorizationInfo authorization = AuthorizationInfo.empty();</span>
+        private SecurityClassification classification;
+
+        public Builder route(String route) {
+<span class="fc" id="L107">            this.route = route;</span>
+<span class="fc" id="L108">            return this;</span>
+        }
+
+        public Builder methods(Set&lt;HttpMethod&gt; methods) {
+<span class="fc" id="L112">            this.methods = EnumSet.copyOf(methods);</span>
+<span class="fc" id="L113">            return this;</span>
+        }
+
+        public Builder method(HttpMethod method) {
+<span class="nc" id="L117">            this.methods.add(method);</span>
+<span class="nc" id="L118">            return this;</span>
+        }
+
+        public Builder type(EndpointType type) {
+<span class="fc" id="L122">            this.type = type;</span>
+<span class="fc" id="L123">            return this;</span>
+        }
+
+        public Builder controllerName(String controllerName) {
+<span class="fc" id="L127">            this.controllerName = controllerName;</span>
+<span class="fc" id="L128">            return this;</span>
+        }
+
+        public Builder methodName(String methodName) {
+<span class="fc" id="L132">            this.methodName = methodName;</span>
+<span class="fc" id="L133">            return this;</span>
+        }
+
+        public Builder location(SourceLocation location) {
+<span class="fc" id="L137">            this.location = location;</span>
+<span class="fc" id="L138">            return this;</span>
+        }
+
+        public Builder authorization(AuthorizationInfo authorization) {
+<span class="fc" id="L142">            this.authorization = Objects.requireNonNullElse(authorization, AuthorizationInfo.empty());</span>
+<span class="fc" id="L143">            return this;</span>
+        }
+
+        public Builder classification(SecurityClassification classification) {
+<span class="nc" id="L147">            this.classification = classification;</span>
+<span class="nc" id="L148">            return this;</span>
+        }
+
+        public Endpoint build() {
+<span class="fc" id="L152">            return new Endpoint(route, methods, type, controllerName, methodName,</span>
+                    location, authorization, classification);
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

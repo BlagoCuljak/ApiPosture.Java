@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExtensionManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ApiPosture Core</a> &gt; <a href="index.source.html" class="el_package">com.apiposture.core.extensions</a> &gt; <span class="el_source">ExtensionManager.java</span></div><h1>ExtensionManager.java</h1><pre class="source lang-java linenums">package com.apiposture.core.extensions;
+
+import java.util.*;
+
+/**
+ * Manages ApiPosture extensions for Pro features.
+ */
+<span class="nc" id="L8">public class ExtensionManager {</span>
+
+<span class="nc" id="L10">    private final Map&lt;String, ApiPostureExtension&gt; extensions = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L11">    private final Map&lt;String, ExtensionRule&gt; extensionRules = new LinkedHashMap&lt;&gt;();</span>
+
+    /**
+     * Register an extension.
+     */
+    public void registerExtension(ApiPostureExtension extension) {
+<span class="nc" id="L17">        extensions.put(extension.getId(), extension);</span>
+<span class="nc" id="L18">    }</span>
+
+    /**
+     * Unregister an extension.
+     */
+    public void unregisterExtension(String extensionId) {
+<span class="nc" id="L24">        extensions.remove(extensionId);</span>
+        // Also remove rules from this extension
+<span class="nc" id="L26">        extensionRules.entrySet().removeIf(e -&gt; e.getValue().getExtensionId().equals(extensionId));</span>
+<span class="nc" id="L27">    }</span>
+
+    /**
+     * Register an extension rule.
+     */
+    public void registerRule(ExtensionRule rule) {
+<span class="nc" id="L33">        extensionRules.put(rule.getId(), rule);</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * Get all registered extensions.
+     */
+    public List&lt;ApiPostureExtension&gt; getExtensions() {
+<span class="nc" id="L40">        return new ArrayList&lt;&gt;(extensions.values());</span>
+    }
+
+    /**
+     * Get all registered extension rules.
+     */
+    public List&lt;ExtensionRule&gt; getExtensionRules() {
+<span class="nc" id="L47">        return new ArrayList&lt;&gt;(extensionRules.values());</span>
+    }
+
+    /**
+     * Get licensed extension rules only.
+     */
+    public List&lt;ExtensionRule&gt; getLicensedRules() {
+<span class="nc" id="L54">        return extensionRules.values().stream()</span>
+<span class="nc" id="L55">                .filter(rule -&gt; {</span>
+<span class="nc" id="L56">                    var extension = extensions.get(rule.getExtensionId());</span>
+<span class="nc bnc" id="L57" title="All 4 branches missed.">                    return extension != null &amp;&amp; extension.isLicensed();</span>
+                })
+<span class="nc" id="L59">                .toList();</span>
+    }
+
+    /**
+     * Get an extension by ID.
+     */
+    public Optional&lt;ApiPostureExtension&gt; getExtension(String extensionId) {
+<span class="nc" id="L66">        return Optional.ofNullable(extensions.get(extensionId));</span>
+    }
+
+    /**
+     * Get an extension rule by ID.
+     */
+    public Optional&lt;ExtensionRule&gt; getRule(String ruleId) {
+<span class="nc" id="L73">        return Optional.ofNullable(extensionRules.get(ruleId));</span>
+    }
+
+    /**
+     * Check if any extensions are loaded.
+     */
+    public boolean hasExtensions() {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        return !extensions.isEmpty();</span>
+    }
+
+    /**
+     * Notify extensions that a scan is starting.
+     */
+    public void notifyScanStart(String projectPath) {
+<span class="nc" id="L87">        extensions.values().forEach(ext -&gt; {</span>
+            try {
+<span class="nc" id="L89">                ext.onScanStart(projectPath);</span>
+<span class="nc" id="L90">            } catch (Exception e) {</span>
+                // Log and continue
+<span class="nc" id="L92">                System.err.println(&quot;Extension &quot; + ext.getId() + &quot; failed on scan start: &quot; + e.getMessage());</span>
+<span class="nc" id="L93">            }</span>
+<span class="nc" id="L94">        });</span>
+<span class="nc" id="L95">    }</span>
+
+    /**
+     * Notify extensions that a scan is complete.
+     */
+    public void notifyScanComplete(com.apiposture.core.models.ScanResult result) {
+<span class="nc" id="L101">        extensions.values().forEach(ext -&gt; {</span>
+            try {
+<span class="nc" id="L103">                ext.onScanComplete(result);</span>
+<span class="nc" id="L104">            } catch (Exception e) {</span>
+                // Log and continue
+<span class="nc" id="L106">                System.err.println(&quot;Extension &quot; + ext.getId() + &quot; failed on scan complete: &quot; + e.getMessage());</span>
+<span class="nc" id="L107">            }</span>
+<span class="nc" id="L108">        });</span>
+<span class="nc" id="L109">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
