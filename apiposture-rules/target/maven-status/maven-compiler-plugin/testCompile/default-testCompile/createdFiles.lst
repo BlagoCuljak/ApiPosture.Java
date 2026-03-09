@@ -1,3 +1,0 @@
-com/apiposture/rules/RuleEngineTest.class
-com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.class
-com/apiposture/rules/exposure/PublicWithoutExplicitIntentRuleTest.class

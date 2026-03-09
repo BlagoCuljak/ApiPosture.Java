@@ -74,7 +74,7 @@ public class TerminalFormatter implements OutputFormatter {
         return sb.toString();
     }
 
-    // ── Header ──────────────────────────────────────────────────────────────────
+    // -- Header ------------------------------------------------------------------
 
     private String formatHeader() {
         String title = "ApiPosture Security Scan";
@@ -84,25 +84,26 @@ public class TerminalFormatter implements OutputFormatter {
         return ansi().bold().fgCyan().a(rule(title)).reset().a("\n").toString() + "\n";
     }
 
-    // ── Findings section ────────────────────────────────────────────────────────
+    // -- Findings section --------------------------------------------------------
 
     private String formatFindingsSection(ScanResult result) {
         StringBuilder sb = new StringBuilder();
         Map<Severity, List<Finding>> bySeverity = result.getFindingsBySeverity();
 
-        // Detailed panels — Critical first (top of scrollback), then High, then Medium
-        for (Severity severity : new Severity[]{Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM}) {
-            List<Finding> group = bySeverity.getOrDefault(severity, List.of());
-            if (!group.isEmpty()) {
-                sb.append(formatDetailedGroup(severity, group));
-            }
-        }
-
-        // Compact grid — Low then Info (just above scroll hint, first seen when scrolling up)
-        for (Severity severity : new Severity[]{Severity.LOW, Severity.INFO}) {
+        // Compact grid — Info then Low (top of scrollback, requires most scrolling to reach)
+        for (Severity severity : new Severity[]{Severity.INFO, Severity.LOW}) {
             List<Finding> group = bySeverity.getOrDefault(severity, List.of());
             if (!group.isEmpty()) {
                 sb.append(formatCompactGroup(severity, group));
+            }
+        }
+
+        // Detailed panels — Medium then High then Critical last
+        // (Critical is just above the scroll-hint separator = first seen when scrolling up)
+        for (Severity severity : new Severity[]{Severity.MEDIUM, Severity.HIGH, Severity.CRITICAL}) {
+            List<Finding> group = bySeverity.getOrDefault(severity, List.of());
+            if (!group.isEmpty()) {
+                sb.append(formatDetailedGroup(severity, group));
             }
         }
 
@@ -182,7 +183,7 @@ public class TerminalFormatter implements OutputFormatter {
                 + " " + message + "\n";
     }
 
-    // ── Scroll-hint separator ────────────────────────────────────────────────────
+    // -- Scroll-hint separator ----------------------------------------------------
 
     private String formatScrollHint() {
         String hint = "^^^^ Scroll up for finding details ^^^^";
@@ -192,7 +193,7 @@ public class TerminalFormatter implements OutputFormatter {
         return "\n" + ansi().fgBlack().bold().a(rule(hint)).reset().a("\n").toString() + "\n";
     }
 
-    // ── Summary ──────────────────────────────────────────────────────────────────
+    // -- Summary ------------------------------------------------------------------
 
     private String formatSummary(ScanResult result) {
         StringBuilder sb = new StringBuilder();
@@ -211,7 +212,7 @@ public class TerminalFormatter implements OutputFormatter {
         return "  " + (noColor ? lbl : colorize(lbl, Ansi.Color.WHITE, true)) + " " + value + "\n";
     }
 
-    // ── Severity chart ───────────────────────────────────────────────────────────
+    // -- Severity chart -----------------------------------------------------------
 
     private String formatSeverityChart(ScanResult result) {
         StringBuilder sb = new StringBuilder();
@@ -228,7 +229,7 @@ public class TerminalFormatter implements OutputFormatter {
             String indicator = accessibility.getSeverityIndicator(severity);
             String label     = String.format("%-8s", severity.name());
             int barLen       = Math.max(1, (count * 20) / max);
-            String bar       = "█".repeat(barLen);
+            String bar       = "#".repeat(barLen);
 
             if (noColor) {
                 sb.append("  ").append(indicator).append(" ").append(label)
@@ -244,7 +245,7 @@ public class TerminalFormatter implements OutputFormatter {
         return sb.toString();
     }
 
-    // ── Endpoints table ──────────────────────────────────────────────────────────
+    // -- Endpoints table ----------------------------------------------------------
 
     private String formatEndpointsSection(ScanResult result) {
         StringBuilder sb = new StringBuilder();
@@ -253,7 +254,7 @@ public class TerminalFormatter implements OutputFormatter {
         String hdr = String.format("  %-12s %-38s %-24s %s",
                 "Methods", "Route", "Controller", "Classification");
         sb.append(noColor ? hdr : colorize(hdr, Ansi.Color.WHITE, true)).append("\n");
-        sb.append(noColor ? "  " + "─".repeat(96) : colorize("  " + "─".repeat(96), Ansi.Color.WHITE, false))
+        sb.append(noColor ? "  " + "-".repeat(96) : colorize("  " + "-".repeat(96), Ansi.Color.WHITE, false))
           .append("\n");
 
         Map<SecurityClassification, List<Endpoint>> byClass = result.getEndpointsByClassification();
@@ -288,7 +289,7 @@ public class TerminalFormatter implements OutputFormatter {
                 + " " + formatClassification(endpoint.classification()) + "\n";
     }
 
-    // ── Footer ───────────────────────────────────────────────────────────────────
+    // -- Footer -------------------------------------------------------------------
 
     private String formatFooter(ScanResult result) {
         StringBuilder sb = new StringBuilder();
@@ -313,7 +314,7 @@ public class TerminalFormatter implements OutputFormatter {
         return sb.toString();
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────────
+    // -- Helpers ------------------------------------------------------------------
 
     private String formatClassification(SecurityClassification classification) {
         String indicator = accessibility.getClassificationIndicator(classification);
@@ -347,7 +348,7 @@ public class TerminalFormatter implements OutputFormatter {
     /** Full-width rule line with optional centred title. */
     private String rule(String title) {
         int pad = Math.max(0, RULE_WIDTH - title.length() - 4);
-        return "── " + title + " " + "─".repeat(pad);
+        return "-- " + title + " " + "-".repeat(pad);
     }
 
     /** Section rule with newline prepended. */

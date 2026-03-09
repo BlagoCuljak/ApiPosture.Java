@@ -13,7 +13,7 @@ import picocli.CommandLine.Option;
 @Command(
         name = "apiposture",
         description = "Security inspection CLI for Spring Boot/Spring Security APIs",
-        version = "1.0.0-SNAPSHOT",
+        versionProvider = VersionProvider.class,
         mixinStandardHelpOptions = true,
         subcommands = {
                 ScanCommand.class,

@@ -26,22 +26,12 @@ public final class AccessibilityHelper {
             new java.util.EnumMap<>(SecurityClassification.class);
 
     static {
-        SEVERITY_ICONS.put(Severity.CRITICAL, "\u274c");        // Red X
-        SEVERITY_ICONS.put(Severity.HIGH,     "\u26a0\ufe0f"); // Warning sign
-        SEVERITY_ICONS.put(Severity.MEDIUM,   "\u26a1");        // Lightning bolt
-        SEVERITY_ICONS.put(Severity.LOW,      "\u2139\ufe0f"); // Info
-        SEVERITY_ICONS.put(Severity.INFO,     "\u2139\ufe0f"); // Info
-
+        // Text-only labels (emoji removed — not reliably supported on Linux/server terminals)
         SEVERITY_LABELS.put(Severity.CRITICAL, "[CRIT]");
         SEVERITY_LABELS.put(Severity.HIGH,     "[HIGH]");
         SEVERITY_LABELS.put(Severity.MEDIUM,   "[MED]");
         SEVERITY_LABELS.put(Severity.LOW,      "[LOW]");
         SEVERITY_LABELS.put(Severity.INFO,     "[INFO]");
-
-        CLASSIFICATION_ICONS.put(SecurityClassification.PUBLIC,           "\uD83D\uDD13"); // Unlocked
-        CLASSIFICATION_ICONS.put(SecurityClassification.AUTHENTICATED,    "\uD83D\uDD10"); // Lock with key
-        CLASSIFICATION_ICONS.put(SecurityClassification.ROLE_RESTRICTED,  "\uD83D\uDD12"); // Locked
-        CLASSIFICATION_ICONS.put(SecurityClassification.POLICY_RESTRICTED,"\uD83D\uDEE1"); // Shield
 
         CLASSIFICATION_LABELS.put(SecurityClassification.PUBLIC,            "[PUBLIC]");
         CLASSIFICATION_LABELS.put(SecurityClassification.AUTHENTICATED,     "[AUTH]");
@@ -75,33 +65,23 @@ public final class AccessibilityHelper {
     }
 
     private static boolean determineUseIcons(boolean noIconsFlag) {
-        if (noIconsFlag) return false;
-        // Auto-detect: disable icons on Windows legacy consoles (cmd.exe, PowerShell)
-        // which cannot render emoji. Windows Terminal sets WT_SESSION and handles emoji fine.
-        String os = System.getProperty("os.name", "").toLowerCase();
-        if (os.contains("win")) {
-            String wtSession = System.getenv("WT_SESSION");
-            if (wtSession == null || wtSession.isEmpty()) return false;
-        }
-        return true;
+        // Emoji icons removed — terminal support is too unreliable across platforms.
+        // Text labels are always used regardless of the noIcons flag.
+        return false;
     }
 
     public boolean isUseColors() { return useColors; }
     public boolean isUseIcons()  { return useIcons; }
 
     public String getSeverityIndicator(Severity severity) {
-        return useIcons
-                ? SEVERITY_ICONS.getOrDefault(severity, "?")
-                : SEVERITY_LABELS.getOrDefault(severity, "[?]");
+        return SEVERITY_LABELS.getOrDefault(severity, "[?]");
     }
 
     public String getClassificationIndicator(SecurityClassification classification) {
-        return useIcons
-                ? CLASSIFICATION_ICONS.getOrDefault(classification, "?")
-                : CLASSIFICATION_LABELS.getOrDefault(classification, "[?]");
+        return CLASSIFICATION_LABELS.getOrDefault(classification, "[?]");
     }
 
-    public String getSuccessIndicator()  { return useIcons ? "\u2705" : "[OK]"; }
-    public String getFailureIndicator()  { return useIcons ? "\u274c"  : "[FAIL]"; }
-    public String getWarningIndicator()  { return useIcons ? "\u26a0\ufe0f" : "[WARN]"; }
+    public String getSuccessIndicator()  { return "[OK]"; }
+    public String getFailureIndicator()  { return "[FAIL]"; }
+    public String getWarningIndicator()  { return "[WARN]"; }
 }
