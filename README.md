@@ -2,10 +2,20 @@
 
 [![Build and Test](https://github.com/BlagoCuljak/ApiPosture.Java/actions/workflows/build.yml/badge.svg)](https://github.com/BlagoCuljak/ApiPosture.Java/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-21+-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://checkout.revolut.com/pay/525834c6-21cd-4d72-bb99-2dc27d3a0a6d)
 
 Security inspection CLI for Spring Boot/Spring Security APIs using static source-code analysis.
 
 ApiPosture scans your Spring Boot project and identifies authorization misconfigurations, security risks, and potential vulnerabilities - all without running your application.
+
+### Terminal Output
+
+![Terminal Output](assets/images/Java1_result.webp)
+
+### Findings Report
+
+![Findings Report](assets/images/Java2_result.webp)
 
 ## Features
 
