@@ -15,26 +15,13 @@ public class TerminalFormatter implements OutputFormatter {
     private final boolean noColor;
     private final boolean noIcons;
 
-    // Icons for severity levels
-    private static final Map<Severity, String> SEVERITY_ICONS = Map.of(
-            Severity.CRITICAL, "\u26D4",  // No entry sign
-            Severity.HIGH, "\u2757",      // Exclamation mark
-            Severity.MEDIUM, "\u26A0",    // Warning sign
-            Severity.LOW, "\u2139",       // Info sign
-            Severity.INFO, "\u2022"       // Bullet point
-    );
-
-    // Classification icons
-    private static final Map<SecurityClassification, String> CLASSIFICATION_ICONS = Map.of(
-            SecurityClassification.PUBLIC, "\uD83D\uDD13",           // Unlocked
-            SecurityClassification.AUTHENTICATED, "\uD83D\uDD10",    // Locked with key
-            SecurityClassification.ROLE_RESTRICTED, "\uD83D\uDD12",  // Locked
-            SecurityClassification.POLICY_RESTRICTED, "\uD83D\uDEE1" // Shield
-    );
+    private final AccessibilityHelper accessibility;
 
     public TerminalFormatter(boolean noColor, boolean noIcons) {
-        this.noColor = noColor;
-        this.noIcons = noIcons;
+        this.accessibility = AccessibilityHelper.create(noColor, noIcons);
+        // Use the resolved values (env-detected) rather than raw CLI flags
+        this.noColor = !accessibility.isUseColors();
+        this.noIcons = !accessibility.isUseIcons();
     }
 
     @Override
@@ -221,7 +208,8 @@ public class TerminalFormatter implements OutputFormatter {
     }
 
     private String formatSeverity(Severity severity) {
-        String icon = noIcons ? "" : SEVERITY_ICONS.getOrDefault(severity, "") + " ";
+        String indicator = accessibility.getSeverityIndicator(severity);
+        String icon = noIcons ? indicator + " " : indicator + " ";
         String name = severity.name();
 
         if (noColor) {
@@ -240,7 +228,8 @@ public class TerminalFormatter implements OutputFormatter {
     }
 
     private String formatClassification(SecurityClassification classification) {
-        String icon = noIcons ? "" : CLASSIFICATION_ICONS.getOrDefault(classification, "") + " ";
+        String indicator = accessibility.getClassificationIndicator(classification);
+        String icon = indicator + " ";
         String name = classification.name().replace("_", " ");
 
         if (noColor) {
