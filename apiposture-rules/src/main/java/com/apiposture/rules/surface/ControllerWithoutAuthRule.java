@@ -1,6 +1,7 @@
 package com.apiposture.rules.surface;
 
 import com.apiposture.core.models.*;
+import com.apiposture.rules.KnownPublicRouteSegments;
 import com.apiposture.rules.SecurityRule;
 
 import java.util.Optional;
@@ -43,6 +44,11 @@ public class ControllerWithoutAuthRule implements SecurityRule {
 
         // Check if there's ANY security annotation
         if (auth != null && (auth.hasAnySecurity() || auth.hasPermitAll() || auth.hasDenyAll())) {
+            return Optional.empty();
+        }
+
+        // Skip known-public routes (auth entry points, health probes, webhooks, OAuth flows)
+        if (KnownPublicRouteSegments.isKnownPublicEndpoint(endpoint.route())) {
             return Optional.empty();
         }
 

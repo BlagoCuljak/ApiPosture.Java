@@ -1,6 +1,7 @@
 package com.apiposture.rules.surface;
 
 import com.apiposture.core.models.*;
+import com.apiposture.rules.KnownPublicRouteSegments;
 import com.apiposture.rules.SecurityRule;
 
 import java.util.Optional;
@@ -13,15 +14,21 @@ import java.util.regex.Pattern;
  */
 public class SensitiveRouteKeywordsRule implements SecurityRule {
 
+    // "health" removed: health-check endpoints are public by convention (K8s probes, etc.)
+    // "info" removed: too noisy — standalone /info is already caught by "actuator" when it's an
+    //   actuator endpoint, and /auth/info or /sso/info are intentional public discovery endpoints.
+    //   Compound uses like "attrInfo", "receiverInfo" are also handled by word-boundary matching.
     private static final Set<String> SENSITIVE_KEYWORDS = Set.of(
             "admin", "debug", "export", "import", "backup", "restore",
             "config", "configuration", "settings", "internal", "private",
-            "secret", "token", "key", "password", "credential",
-            "management", "actuator", "metrics", "health", "info"
+            "secret", "key", "credential",
+            "management", "actuator", "metrics"
     );
 
+    // Word-boundary anchors prevent matching keywords embedded in compound identifiers
+    // (e.g. "info" inside "attrInfo", "token" inside "refreshToken", "config" inside "genConfig")
     private static final Pattern KEYWORD_PATTERN = Pattern.compile(
-            "(?i)(" + String.join("|", SENSITIVE_KEYWORDS) + ")"
+            "(?i)(?<![a-z])(" + String.join("|", SENSITIVE_KEYWORDS) + ")(?![a-z])"
     );
 
     @Override
@@ -49,6 +56,12 @@ public class SensitiveRouteKeywordsRule implements SecurityRule {
     public Optional<Finding> evaluate(Endpoint endpoint) {
         // Only check public endpoints
         if (endpoint.classification() != SecurityClassification.PUBLIC) {
+            return Optional.empty();
+        }
+
+        // Skip known-public routes — keywords like "admin" in /admin/login or "info" in
+        // /sso/info are intentional; flagging them would be noise, not signal.
+        if (KnownPublicRouteSegments.isKnownPublicEndpoint(endpoint.route())) {
             return Optional.empty();
         }
 
