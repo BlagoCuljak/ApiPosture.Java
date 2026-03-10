@@ -1,3 +1,6 @@
-com/apiposture/rules/RuleEngineTest.class
-com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.class
+com/apiposture/rules/surface/SensitiveRouteKeywordsRuleTest.class
 com/apiposture/rules/exposure/PublicWithoutExplicitIntentRuleTest.class
+com/apiposture/rules/KnownPublicRouteSegmentsTest.class
+com/apiposture/rules/surface/ControllerWithoutAuthRuleTest.class
+com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.class
+com/apiposture/rules/RuleEngineTest.class

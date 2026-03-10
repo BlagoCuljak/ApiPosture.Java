@@ -1,2 +1,2 @@
-/home/blago/repos/ApiPosture.Java/apiposture-core/src/test/java/com/apiposture/core/authorization/AnnotationAuthorizationExtractorTest.java
-/home/blago/repos/ApiPosture.Java/apiposture-core/src/test/java/com/apiposture/core/discovery/ControllerEndpointDiscovererTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-core/src/test/java/com/apiposture/core/authorization/AnnotationAuthorizationExtractorTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-core/src/test/java/com/apiposture/core/discovery/ControllerEndpointDiscovererTest.java

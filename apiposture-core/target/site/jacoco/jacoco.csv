@@ -11,8 +11,8 @@ ApiPosture Core,com.apiposture.core.models,SecurityClassification,60,0,8,0,13,0,
 ApiPosture Core,com.apiposture.core.models,Finding,54,0,4,0,6,0,6,0,4,0
 ApiPosture Core,com.apiposture.core.models,Finding.Builder,52,0,0,0,15,0,8,0,8,0
 ApiPosture Core,com.apiposture.core.models,Endpoint,106,31,4,0,15,2,11,2,9,2
-ApiPosture Core,com.apiposture.core.models,ScanResult,215,0,14,0,33,0,18,0,11,0
 ApiPosture Core,com.apiposture.core.models,Endpoint.Builder,12,72,0,0,4,19,2,9,2,9
+ApiPosture Core,com.apiposture.core.models,ScanResult,215,0,14,0,33,0,18,0,11,0
 ApiPosture Core,com.apiposture.core.discovery,ControllerEndpointDiscoverer,63,399,15,27,14,100,13,33,1,24
 ApiPosture Core,com.apiposture.core.authorization,AnnotationAuthorizationExtractor,102,309,16,30,23,74,19,25,6,13
 ApiPosture Core,com.apiposture.core.extensions,ExtensionRule,2,0,0,0,1,0,1,0,1,0

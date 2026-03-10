@@ -1,3 +1,6 @@
-/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/RuleEngineTest.java
-/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.java
-/home/blago/repos/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/exposure/PublicWithoutExplicitIntentRuleTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/KnownPublicRouteSegmentsTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/RuleEngineTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/consistency/MissingAuthOnWritesRuleTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/exposure/PublicWithoutExplicitIntentRuleTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/surface/ControllerWithoutAuthRuleTest.java
+/home/blago/repos/Java/ApiPosture.Java/apiposture-rules/src/test/java/com/apiposture/rules/surface/SensitiveRouteKeywordsRuleTest.java

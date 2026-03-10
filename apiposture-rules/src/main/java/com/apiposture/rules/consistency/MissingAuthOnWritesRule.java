@@ -1,6 +1,7 @@
 package com.apiposture.rules.consistency;
 
 import com.apiposture.core.models.*;
+import com.apiposture.rules.KnownPublicRouteSegments;
 import com.apiposture.rules.SecurityRule;
 
 import java.util.Optional;
@@ -48,6 +49,11 @@ public class MissingAuthOnWritesRule implements SecurityRule {
 
         // If explicitly marked with @PermitAll, AP002 handles that
         if (auth != null && auth.hasPermitAll()) {
+            return Optional.empty();
+        }
+
+        // Skip known-public routes (auth entry points, health probes, webhooks, OAuth flows)
+        if (KnownPublicRouteSegments.isKnownPublicEndpoint(endpoint.route())) {
             return Optional.empty();
         }
 

@@ -19,7 +19,7 @@ com/apiposture/core/models/Severity.class
 com/apiposture/core/models/SourceLocation.class
 com/apiposture/core/classification/SecurityClassifier.class
 com/apiposture/core/analysis/SourceFileLoader$1.class
-com/apiposture/core/models/Endpoint$Builder.class
 com/apiposture/core/extensions/ExtensionManager.class
-com/apiposture/core/models/HttpMethod.class
+com/apiposture/core/models/Endpoint$Builder.class
 com/apiposture/core/analysis/ProjectAnalyzer$AnalysisResult.class
+com/apiposture/core/models/HttpMethod.class
