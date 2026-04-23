@@ -6,7 +6,7 @@
 
     <groupId>com.apiposture</groupId>
     <artifactId>apiposture-parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
     <packaging>pom</packaging>
 
     <name>ApiPosture</name>
@@ -32,13 +32,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency versions -->
-        <javaparser.version>3.26.2</javaparser.version>
-        <jackson.version>2.17.2</jackson.version>
-        <picocli.version>4.7.6</picocli.version>
-        <jansi.version>2.4.1</jansi.version>
+        <javaparser.version>3.28.0</javaparser.version>
+        <jackson.version>2.21.2</jackson.version>
+        <picocli.version>4.7.7</picocli.version>
+        <jansi.version>2.4.3</jansi.version>
         <junit.version>5.11.3</junit.version>
         <assertj.version>3.26.3</assertj.version>
-        <jacoco.version>0.8.12</jacoco.version>
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencyManagement>
