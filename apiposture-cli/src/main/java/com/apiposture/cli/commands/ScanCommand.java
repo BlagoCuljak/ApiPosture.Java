@@ -37,7 +37,7 @@ public class ScanCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Path to the project to scan", defaultValue = ".")
     private Path projectPath;
 
-    @Option(names = {"-o", "--output"}, description = "Output format: terminal, json, markdown (default: terminal)")
+    @Option(names = {"-o", "--output"}, description = "Output format: terminal, json, markdown, html (default: terminal)")
     private OutputFormat output = OutputFormat.terminal;
 
     @Option(names = {"-f", "--output-file"}, description = "Write output to file instead of stdout")
@@ -65,7 +65,7 @@ public class ScanCommand implements Callable<Integer> {
     private List<String> disabledRules;
 
     public enum OutputFormat {
-        terminal, json, markdown
+        terminal, json, markdown, html
     }
 
     public enum SortBy {
@@ -184,6 +184,7 @@ public class ScanCommand implements Callable<Integer> {
             case terminal -> new TerminalFormatter(noColor, noIcons);
             case json -> new JsonFormatter();
             case markdown -> new MarkdownFormatter();
+            case html -> new HtmlFormatter();
         };
     }
 }

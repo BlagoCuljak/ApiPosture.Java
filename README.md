@@ -63,6 +63,9 @@ java -jar apiposture.jar scan /path/to/project --output json
 # Output as Markdown
 java -jar apiposture.jar scan /path/to/project --output markdown -f report.md
 
+# Output as HTML
+java -jar apiposture.jar scan /path/to/project --output html -f report.html
+
 # Fail if critical/high findings (for CI)
 java -jar apiposture.jar scan /path/to/project --fail-on high
 ```
@@ -89,7 +92,7 @@ Arguments:
   PATH                      Path to the project to scan (default: .)
 
 Options:
-  -o, --output <format>     Output format: terminal, json, markdown (default: terminal)
+  -o, --output <format>     Output format: terminal, json, markdown, html (default: terminal)
   -f, --output-file <path>  Write output to file
       --severity <level>    Minimum severity: info, low, medium, high, critical
       --fail-on <level>     Exit code 1 if findings >= severity (for CI)
