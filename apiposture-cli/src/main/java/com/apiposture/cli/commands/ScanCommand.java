@@ -1,5 +1,6 @@
 package com.apiposture.cli.commands;
 
+import com.apiposture.cli.output.HtmlFormatter;
 import com.apiposture.cli.output.JsonFormatter;
 import com.apiposture.cli.output.MarkdownFormatter;
 import com.apiposture.cli.output.OutputFormatter;
