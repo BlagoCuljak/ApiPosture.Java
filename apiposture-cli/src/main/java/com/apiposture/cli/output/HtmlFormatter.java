@@ -118,6 +118,9 @@ public class HtmlFormatter implements OutputFormatter {
                 sb.append("  <p><strong>Location:</strong> <code>")
                         .append(escape(formatLocation(finding.endpoint().location()))).append("</code></p>\n");
             }
+        } else if (finding.location() != null) {
+            sb.append("  <p><strong>Location:</strong> <code>")
+                    .append(escape(formatLocation(finding.location()))).append("</code></p>\n");
         }
 
         sb.append("  <p>").append(escape(finding.message())).append("</p>\n");

@@ -10,9 +10,11 @@ import com.apiposture.rules.exposure.PermitAllOnWriteRule;
 import com.apiposture.rules.exposure.PublicWithoutExplicitIntentRule;
 import com.apiposture.rules.privilege.ExcessiveRoleAccessRule;
 import com.apiposture.rules.privilege.WeakRoleNamingRule;
+import com.apiposture.rules.secrets.HardcodedSecretRule;
 import com.apiposture.rules.surface.ControllerWithoutAuthRule;
 import com.apiposture.rules.surface.SensitiveRouteKeywordsRule;
 
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -22,6 +24,7 @@ public class RuleEngine {
 
     private final List<SecurityRule> rules;
     private final Set<String> disabledRules;
+    private final HardcodedSecretRule secretRule = new HardcodedSecretRule();
     private Severity minimumSeverity;
 
     public RuleEngine() {
@@ -117,6 +120,22 @@ public class RuleEngine {
                 .comparing((Finding f) -> f.severity().getLevel()).reversed()
                 .thenComparing(Finding::ruleId));
 
+        return findings;
+    }
+
+    /**
+     * Run the file-level hardcoded secret rule (AP201) over the given files.
+     * Honors rule disabling and the minimum severity threshold.
+     */
+    public List<Finding> evaluateSecrets(Path root, List<Path> files) {
+        if (disabledRules.contains(HardcodedSecretRule.ID)
+                || !secretRule.getDefaultSeverity().isAtLeast(minimumSeverity)) {
+            return List.of();
+        }
+        List<Finding> findings = new ArrayList<>();
+        for (Path file : files) {
+            findings.addAll(secretRule.scanFile(root, file));
+        }
         return findings;
     }
 

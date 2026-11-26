@@ -1,5 +1,6 @@
 package com.apiposture.core.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -11,12 +12,24 @@ public record Finding(
         @JsonProperty("severity") Severity severity,
         @JsonProperty("message") String message,
         @JsonProperty("endpoint") Endpoint endpoint,
-        @JsonProperty("recommendation") String recommendation
+        @JsonProperty("recommendation") String recommendation,
+        @JsonProperty("location") @JsonInclude(JsonInclude.Include.NON_NULL) SourceLocation location
 ) {
+    /**
+     * Create a finding that is tied to an endpoint (no explicit location).
+     */
+    public Finding(String ruleId, String ruleName, Severity severity, String message,
+                   Endpoint endpoint, String recommendation) {
+        this(ruleId, ruleName, severity, message, endpoint, recommendation, null);
+    }
+
     /**
      * Get the location string for this finding.
      */
     public String getLocationString() {
+        if (location != null) {
+            return location.toString();
+        }
         if (endpoint == null || endpoint.location() == null) {
             return "unknown";
         }
@@ -44,6 +57,12 @@ public record Finding(
         private String message;
         private Endpoint endpoint;
         private String recommendation;
+        private SourceLocation location;
+
+        public Builder location(SourceLocation location) {
+            this.location = location;
+            return this;
+        }
 
         public Builder ruleId(String ruleId) {
             this.ruleId = ruleId;
@@ -76,7 +95,7 @@ public record Finding(
         }
 
         public Finding build() {
-            return new Finding(ruleId, ruleName, severity, message, endpoint, recommendation);
+            return new Finding(ruleId, ruleName, severity, message, endpoint, recommendation, location);
         }
     }
 }

@@ -123,6 +123,53 @@ public class SourceFileLoader {
     }
 
     /**
+     * Find files that may contain hardcoded secrets: Java sources plus
+     * application*.properties / application*.yml / application*.yaml and .env files.
+     */
+    public List<Path> findSecretScanFiles(Path directory) throws IOException {
+        List<Path> files = new ArrayList<>(findJavaFiles(directory));
+        if (!Files.exists(directory)) {
+            return files;
+        }
+        Files.walkFileTree(directory, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                String dirName = dir.getFileName() == null ? "" : dir.getFileName().toString();
+                if (dirName.equals("target") || dirName.equals("build") || dirName.equals(".git")
+                        || dirName.equals(".idea") || dirName.equals("node_modules")) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+                for (String pattern : excludePatterns) {
+                    if (matchesPattern(dir, pattern)) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                String name = file.getFileName().toString().toLowerCase();
+                boolean config = (name.startsWith("application")
+                        && (name.endsWith(".properties") || name.endsWith(".yml") || name.endsWith(".yaml")))
+                        || name.equals(".env")
+                        || (name.startsWith(".env.") && !name.endsWith(".example")
+                        && !name.endsWith(".sample") && !name.endsWith(".template"));
+                if (config && excludePatterns.stream().noneMatch(p -> matchesPattern(file, p))) {
+                    files.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return files;
+    }
+
+    /**
      * Load and parse all Java files from a directory.
      */
     public List<ParsedFile> loadProject(Path projectPath) throws IOException {

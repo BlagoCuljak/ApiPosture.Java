@@ -21,7 +21,7 @@ ApiPosture scans your Spring Boot project and identifies authorization misconfig
 
 - **Static Analysis** - Analyzes source code using JavaParser (no compilation required)
 - **Spring Security Detection** - Recognizes `@PreAuthorize`, `@Secured`, `@RolesAllowed`, `@PermitAll`, `@DenyAll`
-- **8 Security Rules** - Built-in rules covering exposure, consistency, privilege, and attack surface
+- **9 Security Rules** - Built-in rules covering exposure, consistency, privilege, attack surface, and hardcoded secrets
 - **Multiple Output Formats** - Terminal (colored), JSON, and Markdown
 - **CI/CD Integration** - Exit codes and `--fail-on` option for pipeline integration
 
@@ -82,6 +82,15 @@ java -jar apiposture.jar scan /path/to/project --fail-on high
 | AP006 | Weak role naming | LOW | Generic roles like "User", "Admin" |
 | AP007 | Sensitive route keywords | MEDIUM | admin/debug/export in public routes |
 | AP008 | Controller without auth | HIGH | Controller with no security annotations |
+| AP201 | Hardcoded secret | HIGH | Provider-prefixed credential (AWS, GitHub, Stripe, Slack, PEM key, ...) in source or config |
+
+### AP201: Hardcoded secret
+
+Detects provider-prefixed credentials committed to Java sources and `application*.properties`, `application*.yml` and `.env` files: AWS access key IDs, GCP API keys, GitHub and GitLab tokens, Stripe live secret/restricted keys, Slack tokens and webhooks, SendGrid, npm and DigitalOcean tokens, and PEM private key headers. Generic heuristics (`password=`, `token=`, JWTs, connection strings) are deliberately not checked, to keep false positives low.
+
+- Reports file and line only; the secret is never printed in full (first 4 characters plus an ellipsis).
+- Skips test, sample, example, docs, vendor and build directories (and `*Test.java`, `*Tests.java`, `*IT.java`), and values containing placeholder markers such as `EXAMPLE`, `changeme` or `<...>`.
+- Disable with `--disable-rule AP201`.
 
 ## CLI Options
 
@@ -179,11 +188,12 @@ ApiPosture.Java/
 │       ├── exposure/         # AP001, AP002
 │       ├── consistency/      # AP003, AP004
 │       ├── privilege/        # AP005, AP006
-│       └── surface/          # AP007, AP008
+│       ├── surface/          # AP007, AP008
+│       └── secrets/          # AP201
 ├── apiposture-cli/           # CLI application
 │   └── src/main/java/com/apiposture/cli/
 │       ├── ApiPosture.java   # Main entry point
-│       ├── commands/         # ScanCommand, LicenseCommand
+│       ├── commands/         # ScanCommand
 │       └── output/           # Terminal, JSON, Markdown formatters
 └── samples/sample-spring-boot/  # Sample project for testing
 ```

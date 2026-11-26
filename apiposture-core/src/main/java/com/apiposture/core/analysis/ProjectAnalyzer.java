@@ -68,6 +68,13 @@ public class ProjectAnalyzer {
     }
 
     /**
+     * Find files that should be checked for hardcoded secrets.
+     */
+    public List<Path> findSecretScanFiles(Path projectPath) throws IOException {
+        return fileLoader.findSecretScanFiles(projectPath);
+    }
+
+    /**
      * Result of project analysis.
      */
     public record AnalysisResult(

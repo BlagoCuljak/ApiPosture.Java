@@ -1,6 +1,5 @@
 package com.apiposture.cli;
 
-import com.apiposture.cli.commands.LicenseCommand;
 import com.apiposture.cli.commands.ScanCommand;
 import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
@@ -17,7 +16,6 @@ import picocli.CommandLine.Option;
         mixinStandardHelpOptions = true,
         subcommands = {
                 ScanCommand.class,
-                LicenseCommand.class,
                 CommandLine.HelpCommand.class
         }
 )

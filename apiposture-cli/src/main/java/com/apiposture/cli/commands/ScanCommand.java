@@ -6,6 +6,7 @@ import com.apiposture.cli.output.MarkdownFormatter;
 import com.apiposture.cli.output.OutputFormatter;
 import com.apiposture.cli.output.TerminalFormatter;
 import com.apiposture.core.analysis.ProjectAnalyzer;
+import com.apiposture.core.models.Finding;
 import com.apiposture.core.models.ScanResult;
 import com.apiposture.core.models.SecurityClassification;
 import com.apiposture.core.models.Severity;
@@ -18,6 +19,8 @@ import picocli.CommandLine.ParentCommand;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -105,6 +108,25 @@ public class ScanCommand implements Callable<Integer> {
 
             // Run rules
             ScanResult scanResult = ruleEngine.evaluateToScanResult(analysisResult.toScanResult());
+
+            // File-level secret detection (AP201)
+            List<Finding> secretFindings = ruleEngine.evaluateSecrets(
+                    projectPath, analyzer.findSecretScanFiles(projectPath));
+            if (!secretFindings.isEmpty()) {
+                List<Finding> all = new ArrayList<>(scanResult.findings());
+                all.addAll(secretFindings);
+                all.sort(Comparator
+                        .comparing((Finding f) -> f.severity().getLevel()).reversed()
+                        .thenComparing(Finding::ruleId));
+                scanResult = ScanResult.builder()
+                        .projectPath(scanResult.projectPath())
+                        .endpoints(scanResult.endpoints())
+                        .findings(all)
+                        .scannedFiles(scanResult.scannedFiles())
+                        .scanDuration(scanResult.scanDuration())
+                        .timestamp(scanResult.timestamp())
+                        .build();
+            }
 
             // Filter results if needed
             scanResult = filterResults(scanResult);

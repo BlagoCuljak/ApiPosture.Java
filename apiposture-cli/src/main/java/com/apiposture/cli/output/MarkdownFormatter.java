@@ -105,6 +105,8 @@ public class MarkdownFormatter implements OutputFormatter {
             if (finding.endpoint().location() != null) {
                 sb.append("**Location:** ").append(formatLocation(finding.endpoint().location())).append("\n\n");
             }
+        } else if (finding.location() != null) {
+            sb.append("**Location:** ").append(formatLocation(finding.location())).append("\n\n");
         }
 
         // Recommendation

@@ -151,6 +151,9 @@ public class TerminalFormatter implements OutputFormatter {
                 sb.append("  ").append(colorize("Location: ", Ansi.Color.WHITE, true))
                   .append(finding.endpoint().location()).append("\n");
             }
+        } else if (finding.location() != null) {
+            sb.append("  ").append(colorize("Location: ", Ansi.Color.WHITE, true))
+              .append(finding.location()).append("\n");
         }
 
         sb.append("\n  ").append(finding.message()).append("\n");
@@ -169,6 +172,10 @@ public class TerminalFormatter implements OutputFormatter {
             String ep = finding.endpoint().formatMethods() + " " + finding.endpoint().route();
             endpoint = ep.length() <= COMPACT_COL_WIDTH
                     ? ep : ep.substring(0, COMPACT_COL_WIDTH - 3) + "...";
+        } else if (finding.location() != null) {
+            String loc = finding.location().toString();
+            endpoint = loc.length() <= COMPACT_COL_WIDTH
+                    ? loc : "..." + loc.substring(loc.length() - COMPACT_COL_WIDTH + 3);
         }
         String endpointPadded = String.format("%-" + COMPACT_COL_WIDTH + "s", endpoint);
         String message = finding.message() != null && finding.message().length() > 55
